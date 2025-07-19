@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multilingual Shopping List Demo</title>
+    <title>Shopping Demo - Regional Shopping AI</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <style>
         * {
             margin: 0;
@@ -317,9 +318,41 @@
                 font-size: 1em;
             }
         }
+        
+        .navigation {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #333;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-btn:hover {
+            background: white;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 <body>
+    <div class="navigation">
+        <a href="/" class="nav-btn">← Back to Main</a>
+    </div>
+    
     <div class="container">
         <div class="header">
             <h1>🛒 Multilingual Shopping List</h1>
