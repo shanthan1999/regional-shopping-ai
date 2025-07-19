@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual Shopping List Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .search-section, .list-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: #4CAF50;
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .search-btn:hover {
+            background: #45a049;
+        }
+        
+        .examples {
+            margin-bottom: 20px;
+        }
+        
+        .example-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .example-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-tag:hover {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .item-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .item-card:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+        
+        .item-header {
+            margin-bottom: 8px;
+        }
+        
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 1.1em;
+            margin-bottom: 3px;
+        }
+        
+        .item-brand-info {
+            color: #4CAF50;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+        
+        .item-hindi {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+        
+        .item-description {
+            color: #555;
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        
+        .item-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .item-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .fat-content {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.8em;
+        }
+        
+        .item-category {
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #666;
+        }
+        
+        .item-price {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .add-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .shopping-list {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-item-info {
+            flex: 1;
+        }
+        
+        .list-item-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .list-item-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .remove-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Multilingual Shopping List</h1>
+            <p>Search for items in Hindi (English letters) and build your shopping list</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="search-section">
+                <h2 class="section-title">🔍 Search Items</h2>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" 
+                           placeholder="Type in Hindi: palak, bhindi, doodh, chawal...">
+                    <button class="search-btn" onclick="searchItems()">Search</button>
+                </div>
+                
+                <div class="examples">
+                    <p><strong>Try these examples:</strong></p>
+                    <div class="example-tags">
+                        <span class="example-tag" onclick="searchExample('palak')">palak</span>
+                        <span class="example-tag" onclick="searchExample('bhindi')">bhindi</span>
+                        <span class="example-tag" onclick="searchExample('doodh')">doodh</span>
+                        <span class="example-tag" onclick="searchExample('chawal')">chawal</span>
+                        <span class="example-tag" onclick="searchExample('paneer')">paneer</span>
+                        <span class="example-tag" onclick="searchExample('kothimbir')">kothimbir</span>
+                        <span class="example-tag" onclick="searchExample('adrak lehsun')">adrak lehsun</span>
+                    </div>
+                </div>
+                
+                <div id="searchResults" class="results"></div>
+            </div>
+            
+            <div class="list-section">
+                <h2 class="section-title">📝 Shopping List</h2>
+                
+                <div class="stats">
+                    <div id="listStats">No items in list</div>
+                </div>
+                
+                <div id="shoppingList" class="shopping-list">
+                    <p style="text-align: center; color: #666; padding: 20px;">
+                        Your shopping list is empty. Search and add items!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentListId = null;
+        let shoppingListItems = [];
+        
+        // Initialize shopping list on page load
+        window.onload = function() {
+            createShoppingList();
+        };
+        
+        // Create a new shopping list
+        async function createShoppingList() {
+            try {
+                const response = await fetch('/api/shopping/list', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'My Shopping List'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentListId = data.list.id;
+                    console.log('Shopping list created:', currentListId);
+                } else {
+                    console.error('Failed to create shopping list');
+                }
+            } catch (error) {
+                console.error('Error creating shopping list:', error);
+            }
+        }
+        
+        // Search for items
+        async function searchItems() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+            
+            try {
+                const response = await fetch('/api/shopping/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        limit: 8
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Shopping API Response:', data);
+                    displaySearchResults(data.items);
+                } else {
+                    console.error('Shopping API Error:', response.status, response.statusText);
+                    const errorText = await response.text();
+                    console.error('Error details:', errorText);
+                    resultsDiv.innerHTML = `<div class="error">Search failed (${response.status}). Please try again.</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Network error. Please check your connection.</div>';
+                console.error('Search error:', error);
+            }
+        }
+        
+        // Display search results
+        function displaySearchResults(items) {
+            const resultsDiv = document.getElementById('searchResults');
+            
+            if (items.length === 0) {
+                resultsDiv.innerHTML = '<div class="error">No items found. Try different keywords.</div>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach(item => {
+                const hindiNames = item.hindi_names.join(', ');
+                const brand = item.brand ? `${item.brand} ` : '';
+                const variant = item.variant ? ` - ${item.variant}` : '';
+                const description = item.description ? `<div class="item-description">${item.description}</div>` : '';
+                const fatContent = item.fat_content ? `<span class="fat-content">Fat: ${item.fat_content}</span>` : '';
+                
+                html += `
+                    <div class="item-card" onclick="addToList('${item.id}', '${item.name}')">
+                        <div class="item-header">
+                            <div class="item-name">${brand}${item.name}${variant}</div>
+                            <div class="item-brand-info">${item.subcategory}</div>
+                        </div>
+                        <div class="item-hindi">Hindi: ${hindiNames}</div>
+                        ${description}
+                        <div class="item-details">
+                            <div class="item-left">
+                                <span class="item-category">${item.category}</span>
+                                ${fatContent}
+                            </div>
+                            <div class="item-right">
+                                <span class="item-price">${item.price_range}</span>
+                                <button class="add-btn" onclick="event.stopPropagation(); addToList('${item.id}', '${item.name}')">Add</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Search with example query
+        function searchExample(query) {
+            document.getElementById('searchInput').value = query;
+            searchItems();
+        }
+        
+        // Add item to shopping list
+        async function addToList(itemId, itemName) {
+            if (!currentListId) {
+                await createShoppingList();
+            }
+            
+            try {
+                const response = await fetch(`/api/shopping/list/${currentListId}/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: itemName,
+                        quantity: 1
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    shoppingListItems = data.list.items;
+                    updateShoppingListDisplay();
+                    showMessage('Item added to list!', 'success');
+                } else {
+                    showMessage('Failed to add item', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+                console.error('Add to list error:', error);
+            }
+        }
+        
+        // Update shopping list display
+        function updateShoppingListDisplay() {
+            const listDiv = document.getElementById('shoppingList');
+            const statsDiv = document.getElementById('listStats');
+            
+            if (shoppingListItems.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Your shopping list is empty. Search and add items!</p>';
+                statsDiv.innerHTML = 'No items in list';
+                return;
+            }
+            
+            statsDiv.innerHTML = `${shoppingListItems.length} items in list`;
+            
+            let html = '';
+            shoppingListItems.forEach((item, index) => {
+                const hindiNames = item.hindi_names.join(', ');
+                html += `
+                    <div class="list-item">
+                        <div class="list-item-info">
+                            <div class="list-item-name">${item.name}</div>
+                            <div class="list-item-details">
+                                ${hindiNames} • ${item.quantity} ${item.unit} • ${item.estimated_price}
+                            </div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromList(${index})">Remove</button>
+                    </div>
+                `;
+            });
+            
+            listDiv.innerHTML = html;
+        }
+        
+        // Remove item from shopping list
+        async function removeFromList(index) {
+            if (!currentListId) return;
+            
+            try {
+                const response = await fetch(`/api/shopping/list/${currentListId}/remove/${index}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    shoppingListItems = data.list.items;
+                    updateShoppingListDisplay();
+                    showMessage('Item removed from list', 'success');
+                } else {
+                    showMessage('Failed to remove item', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+                console.error('Remove from list error:', error);
+            }
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageDiv.style.position = 'fixed';
+            messageDiv.style.top = '20px';
+            messageDiv.style.right = '20px';
+            messageDiv.style.zIndex = '1000';
+            messageDiv.style.padding = '10px 20px';
+            messageDiv.style.borderRadius = '5px';
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(messageDiv);
+            }, 3000);
+        }
+        
+        // Handle Enter key in search input
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchItems();
+            }
+        });
+    </script>
+</body>
+</html>

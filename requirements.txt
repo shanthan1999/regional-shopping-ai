@@ -1,0 +1,16 @@
+Flask==3.1.1
+flask-cors==6.0.0
+Flask-SQLAlchemy==3.1.1
+sentence-transformers==5.0.0
+transformers==4.53.2
+torch==2.7.1
+faiss-cpu==1.11.0
+numpy==2.3.1
+scikit-learn==1.7.0
+requests==2.32.4
+huggingface-hub==0.33.4
+safetensors==0.5.3
+tokenizers==0.21.2
+langdetect==1.0.9
+python-dotenv==1.0.1
+duckpy==3.2.0 # Adding duckpy for DuckDuckGo search

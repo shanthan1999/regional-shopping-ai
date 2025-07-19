@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multilingual Shopping List Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .search-section, .list-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            border-color: #4CAF50;
+        }
+        
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .search-btn:hover {
+            background: #45a049;
+        }
+        
+        .examples {
+            margin-bottom: 20px;
+        }
+        
+        .example-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .example-tag {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-tag:hover {
+            background: #1976d2;
+            color: white;
+        }
+        
+        .results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .item-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .item-card:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+        
+        .item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .item-hindi {
+            color: #666;
+            font-style: italic;
+            margin-bottom: 5px;
+        }
+        
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+        }
+        
+        .item-category {
+            background: #f0f0f0;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: #666;
+        }
+        
+        .item-price {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .add-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .shopping-list {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-item-info {
+            flex: 1;
+        }
+        
+        .list-item-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .list-item-details {
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .remove-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .stats {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .search-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            background: #e9ecef;
+            border-radius: 25px;
+            padding: 5px;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            background: transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .tab-btn.active {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .tab-btn:hover:not(.active) {
+            background: #f0f0f0;
+        }
+        
+        .platform-section {
+            margin-bottom: 20px;
+        }
+        
+        .platform-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .platform-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+        }
+        
+        .platform-name {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .delivery-time {
+            font-size: 0.8em;
+            color: #666;
+            margin-left: auto;
+        }
+        
+        .online-item-card {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .online-item-card:hover {
+            border-color: #4CAF50;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+        
+        .online-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        
+        .online-item-name {
+            font-weight: bold;
+            color: #333;
+            font-size: 0.95em;
+        }
+        
+        .online-item-brand {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        .online-item-price {
+            text-align: right;
+        }
+        
+        .current-price {
+            font-weight: bold;
+            color: #4CAF50;
+            font-size: 1.1em;
+        }
+        
+        .original-price {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        .discount {
+            background: #ff4444;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+        }
+        
+        .online-item-details {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .rating {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .rating-stars {
+            color: #ffa500;
+        }
+        
+        .best-deals-section {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .best-deals-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .price-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .platform-comparison {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        
+        .platform-comparison h4 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+        
+        .comparison-price {
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .comparison-delivery {
+            font-size: 0.8em;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .header p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Multilingual Shopping List</h1>
+            <p>Search for items in Hindi (English letters) and build your shopping list</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="search-section">
+                <h2 class="section-title">🔍 Search Items</h2>
+                
+                <div class="search-tabs">
+                    <button class="tab-btn active" onclick="switchTab('duckduckgo')">🦆 DuckDuckGo Shopping</button>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" class="search-input" 
+                           placeholder="Type in Hindi: palak, bhindi, doodh, chawal...">
+                    <button class="search-btn" onclick="searchItems()">Search</button>
+                </div>
+                
+                <div class="examples">
+                    <p><strong>Try these examples:</strong></p>
+                    <div class="example-tags">
+                        <span class="example-tag" onclick="searchExample('palak')">palak</span>
+                        <span class="example-tag" onclick="searchExample('bhindi')">bhindi</span>
+                        <span class="example-tag" onclick="searchExample('doodh')">doodh</span>
+                        <span class="example-tag" onclick="searchExample('chawal')">chawal</span>
+                        <span class="example-tag" onclick="searchExample('paneer')">paneer</span>
+                        <span class="example-tag" onclick="searchExample('kothimbir')">kothimbir</span>
+                        <span class="example-tag" onclick="searchExample('adrak lehsun')">adrak lehsun</span>
+                    </div>
+                </div>
+                
+                <div id="searchResults" class="results"></div>
+            </div>
+            
+            <div class="list-section">
+                <h2 class="section-title">📝 Shopping List</h2>
+                
+                <div class="stats">
+                    <div id="listStats">No items in list</div>
+                </div>
+                
+                <div id="shoppingList" class="shopping-list">
+                    <p style="text-align: center; color: #666; padding: 20px;">
+                        Your shopping list is empty. Search and add items!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentListId = null;
+        let shoppingListItems = [];
+        let currentTab = 'duckduckgo';
+        
+        // Initialize shopping list on page load
+        window.onload = function() {
+            createShoppingList();
+        };
+        
+        // Switch between search tabs
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Clear previous results
+            document.getElementById('searchResults').innerHTML = '';
+            
+            // Update placeholder text
+            const searchInput = document.getElementById('searchInput');
+            searchInput.placeholder = '🦆 Search DuckDuckGo for real products in Hindi: palak, bhindi, doodh...';
+        }
+        
+        // Create a new shopping list
+        async function createShoppingList() {
+            try {
+                const response = await fetch('/api/shopping/list', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        name: 'My Shopping List'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentListId = data.list.id;
+                    console.log('Shopping list created:', currentListId);
+                } else {
+                    console.error('Failed to create shopping list');
+                }
+            } catch (error) {
+                console.error('Error creating shopping list:', error);
+            }
+        }
+        
+        // Search for items based on current tab
+        async function searchItems() {
+            const query = document.getElementById('searchInput').value.trim();
+            if (!query) return;
+            
+            const resultsDiv = document.getElementById('searchResults');
+            resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+            
+            try {
+                let endpoint, displayFunction;
+                
+                // Only DuckDuckGo Shopping
+                endpoint = '/api/shopping/search/duckduckgo';
+                displayFunction = displayDuckDuckGoResults;
+                
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: query,
+                        limit: 8
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(`${currentTab} API Response:`, data);
+                    displayFunction(data);
+                } else {
+                    console.error(`${currentTab} API Error:`, response.status, response.statusText);
+                    const errorText = await response.text();
+                    console.error('Error details:', errorText);
+                    resultsDiv.innerHTML = `<div class="error">Search failed (${response.status}). Please try again.</div>`;
+                }
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="error">Network error. Please check your connection.</div>';
+                console.error('Search error:', error);
+            }
+        }
+        
+        // Display local search results
+        function displayLocalResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            const items = data.items || [];
+            
+            if (items.length === 0) {
+                resultsDiv.innerHTML = '<div class="error">No items found. Try different keywords.</div>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach(item => {
+                const hindiNames = item.hindi_names.join(', ');
+                html += `
+                    <div class="item-card" onclick="addToList('${item.id}', '${item.name}')">
+                        <div class="item-name">${item.name}</div>
+                        <div class="item-hindi">${hindiNames}</div>
+                        <div class="item-details">
+                            <span class="item-category">${item.category}</span>
+                            <span class="item-price">${item.price_range}</span>
+                            <button class="add-btn" onclick="event.stopPropagation(); addToList('${item.id}', '${item.name}')">Add</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Display online search results
+        function displayOnlineResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            const platforms = data.platforms || {};
+            
+            let html = '';
+            
+            // Show best deals section if available
+            if (data.best_deals && data.best_deals.length > 0) {
+                html += `
+                    <div class="best-deals-section">
+                        <div class="best-deals-title">
+                            🔥 Best Deals for "${data.query}"
+                        </div>
+                        <div class="online-item-card">
+                            <div class="online-item-header">
+                                <div>
+                                    <div class="online-item-name">${data.best_deals[0].name}</div>
+                                    <div class="online-item-brand">${data.best_deals[0].brand}</div>
+                                </div>
+                                <div class="online-item-price">
+                                    <div class="current-price">${data.best_deals[0].price}</div>
+                                    ${data.best_deals[0].original_price ? `<div class="original-price">${data.best_deals[0].original_price}</div>` : ''}
+                                    ${data.best_deals[0].discount ? `<div class="discount">${data.best_deals[0].discount}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="online-item-details">
+                                <div class="rating">
+                                    <span class="rating-stars">⭐</span>
+                                    <span>${data.best_deals[0].rating || 'N/A'}</span>
+                                </div>
+                                <div>${data.best_deals[0].delivery_time || 'N/A'}</div>
+                                <div>${data.best_deals[0].platform}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // Show price comparison
+            if (data.price_comparison && Object.keys(data.price_comparison).length > 0) {
+                html += `
+                    <div class="price-comparison">
+                `;
+                
+                Object.entries(data.price_comparison).forEach(([platform, info]) => {
+                    html += `
+                        <div class="platform-comparison">
+                            <h4>${platform.charAt(0).toUpperCase() + platform.slice(1)}</h4>
+                            <div class="comparison-price">${info.average_price}</div>
+                            <div class="comparison-delivery">${info.fastest_delivery}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Show platform-wise results
+            Object.entries(platforms).forEach(([platformName, products]) => {
+                if (products && products.length > 0) {
+                    html += `
+                        <div class="platform-section">
+                            <div class="platform-header">
+                                <div class="platform-name">${platformName.charAt(0).toUpperCase() + platformName.slice(1)}</div>
+                                <div class="delivery-time">${products[0].delivery_time || 'N/A'}</div>
+                            </div>
+                    `;
+                    
+                    products.forEach(product => {
+                        html += `
+                            <div class="online-item-card" onclick="addOnlineItemToList('${product.name}', '${platformName}')">
+                                <div class="online-item-header">
+                                    <div>
+                                        <div class="online-item-name">${product.name}</div>
+                                        <div class="online-item-brand">${product.brand || ''}</div>
+                                    </div>
+                                    <div class="online-item-price">
+                                        <div class="current-price">${product.price}</div>
+                                        ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
+                                        ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
+                                    </div>
+                                </div>
+                                <div class="online-item-details">
+                                    <div class="rating">
+                                        <span class="rating-stars">⭐</span>
+                                        <span>${product.rating || 'N/A'}</span>
+                                    </div>
+                                    <div>${product.quantity || 'N/A'}</div>
+                                    <div>${product.availability || 'Check availability'}</div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`;
+                }
+            });
+            
+            if (html === '') {
+                html = '<div class="error">No online products found. Try different keywords.</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Display combined search results
+        function displayCombinedResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            let html = '';
+            
+            // Show recommendations section
+            if (data.recommendations) {
+                html += `
+                    <div class="best-deals-section">
+                        <div class="best-deals-title">
+                            💡 Smart Recommendations for "${data.query}"
+                        </div>
+                `;
+                
+                if (data.recommendations.best_price) {
+                    html += `
+                        <div class="online-item-card">
+                            <div class="online-item-header">
+                                <div>
+                                    <div class="online-item-name">💰 Best Price: ${data.recommendations.best_price.name}</div>
+                                    <div class="online-item-brand">${data.recommendations.best_price.platform}</div>
+                                </div>
+                                <div class="online-item-price">
+                                    <div class="current-price">${data.recommendations.best_price.price}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (data.recommendations.fastest_delivery) {
+                    html += `
+                        <div class="online-item-card">
+                            <div class="online-item-header">
+                                <div>
+                                    <div class="online-item-name">⚡ Fastest Delivery: ${data.recommendations.fastest_delivery.name}</div>
+                                    <div class="online-item-brand">${data.recommendations.fastest_delivery.platform}</div>
+                                </div>
+                                <div class="online-item-price">
+                                    <div class="current-price">${data.recommendations.fastest_delivery.delivery_time}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+            }
+            
+            // Show local items first
+            if (data.local_items && data.local_items.length > 0) {
+                html += `
+                    <div class="platform-section">
+                        <div class="platform-header">
+                            <div class="platform-name">📦 Local Database</div>
+                            <div class="delivery-time">Instant</div>
+                        </div>
+                `;
+                
+                data.local_items.slice(0, 3).forEach(item => {
+                    const hindiNames = item.hindi_names.join(', ');
+                    html += `
+                        <div class="item-card" onclick="addToList('${item.id}', '${item.name}')">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-hindi">${hindiNames}</div>
+                            <div class="item-details">
+                                <span class="item-category">${item.category}</span>
+                                <span class="item-price">${item.price_range}</span>
+                                <button class="add-btn" onclick="event.stopPropagation(); addToList('${item.id}', '${item.name}')">Add</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            // Show online platforms
+            if (data.online_platforms) {
+                Object.entries(data.online_platforms).forEach(([platformName, products]) => {
+                    if (products && products.length > 0) {
+                        html += `
+                            <div class="platform-section">
+                                <div class="platform-header">
+                                    <div class="platform-name">🛒 ${platformName.charAt(0).toUpperCase() + platformName.slice(1)}</div>
+                                    <div class="delivery-time">${products[0].delivery_time || 'N/A'}</div>
+                                </div>
+                        `;
+                        
+                        products.slice(0, 2).forEach(product => {
+                            html += `
+                                <div class="online-item-card" onclick="addOnlineItemToList('${product.name}', '${platformName}')">
+                                    <div class="online-item-header">
+                                        <div>
+                                            <div class="online-item-name">${product.name}</div>
+                                            <div class="online-item-brand">${product.brand || ''}</div>
+                                        </div>
+                                        <div class="online-item-price">
+                                            <div class="current-price">${product.price}</div>
+                                            ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
+                                        </div>
+                                    </div>
+                                    <div class="online-item-details">
+                                        <div class="rating">
+                                            <span class="rating-stars">⭐</span>
+                                            <span>${product.rating || 'N/A'}</span>
+                                        </div>
+                                        <div>${product.quantity || 'N/A'}</div>
+                                    </div>
+                                </div>
+                            `;
+                        });
+                        
+                        html += `</div>`;
+                    }
+                });
+            }
+            
+            if (html === '') {
+                html = '<div class="error">No results found. Try different keywords.</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Display DuckDuckGo Shopping results
+        function displayDuckDuckGoResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            const products = data.products || [];
+            
+            if (products.length === 0) {
+                resultsDiv.innerHTML = '<div class="error">No DuckDuckGo Shopping results found. Try different keywords.</div>';
+                return;
+            }
+            
+            let html = '<div class="platform-section"><div class="platform-header"><div class="platform-name">🦆 DuckDuckGo Shopping - Privacy-Friendly Search</div></div>';
+            
+            products.forEach(product => {
+                html += `
+                    <div class="online-item-card" style="position:relative;">
+                        <div onclick="window.open('${product.product_url}', '_blank')" style="cursor:pointer;">
+                            <div class="online-item-header">
+                                <div>
+                                    <div class="online-item-name">${product.name}</div>
+                                    <div class="online-item-brand">${product.seller}</div>
+                                </div>
+                                <div class="online-item-price">
+                                    <div class="current-price">${product.price}</div>
+                                    ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
+                                    ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="online-item-details">
+                            <div class="rating">
+                                <span class="rating-stars">⭐</span>
+                                <span>${product.rating || 'N/A'}</span>
+                            </div>
+                            <div>${product.delivery || 'N/A'}</div>
+                            <div>${product.availability || 'Check availability'}</div>
+                        </div>
+                        ${product.description ? `<div style="font-size: 0.8em; color: #666; margin-top: 5px;">${product.description}</div>` : ''}
+                        <button class="add-btn" style="position:absolute;top:10px;right:10px;z-index:2;" onclick="event.stopPropagation(); addOnlineItemToList('${product.name}', 'DuckDuckGo')">Add to List</button>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Add online item to shopping list
+        async function addOnlineItemToList(itemName, platform) {
+            if (!currentListId) {
+                await createShoppingList();
+            }
+            
+            try {
+                const response = await fetch(`/api/shopping/list/${currentListId}/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: itemName,
+                        quantity: 1,
+                        platform: platform
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    shoppingListItems = data.list.items;
+                    updateShoppingListDisplay();
+                    showMessage(`${itemName} from ${platform} added to list!`, 'success');
+                } else {
+                    showMessage('Failed to add item', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+                console.error('Add to list error:', error);
+            }
+        }
+        
+        // Search with example query
+        function searchExample(query) {
+            document.getElementById('searchInput').value = query;
+            searchItems();
+        }
+        
+        // Add item to shopping list
+        async function addToList(itemId, itemName) {
+            if (!currentListId) {
+                await createShoppingList();
+            }
+            
+            try {
+                const response = await fetch(`/api/shopping/list/${currentListId}/add`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: itemName,
+                        quantity: 1
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    shoppingListItems = data.list.items;
+                    updateShoppingListDisplay();
+                    showMessage('Item added to list!', 'success');
+                } else {
+                    showMessage('Failed to add item', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+                console.error('Add to list error:', error);
+            }
+        }
+        
+        // Update shopping list display
+        function updateShoppingListDisplay() {
+            const listDiv = document.getElementById('shoppingList');
+            const statsDiv = document.getElementById('listStats');
+            
+            if (shoppingListItems.length === 0) {
+                listDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Your shopping list is empty. Search and add items!</p>';
+                statsDiv.innerHTML = 'No items in list';
+                return;
+            }
+            
+            statsDiv.innerHTML = `${shoppingListItems.length} items in list`;
+            
+            let html = '';
+            shoppingListItems.forEach((item, index) => {
+                const hindiNames = item.hindi_names.join(', ');
+                html += `
+                    <div class="list-item">
+                        <div class="list-item-info">
+                            <div class="list-item-name">${item.name}</div>
+                            <div class="list-item-details">
+                                ${hindiNames} • ${item.quantity} ${item.unit} • ${item.estimated_price}
+                            </div>
+                        </div>
+                        <button class="remove-btn" onclick="removeFromList(${index})">Remove</button>
+                    </div>
+                `;
+            });
+            
+            listDiv.innerHTML = html;
+        }
+        
+        // Remove item from shopping list
+        async function removeFromList(index) {
+            if (!currentListId) return;
+            
+            try {
+                const response = await fetch(`/api/shopping/list/${currentListId}/remove/${index}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    shoppingListItems = data.list.items;
+                    updateShoppingListDisplay();
+                    showMessage('Item removed from list', 'success');
+                } else {
+                    showMessage('Failed to remove item', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error', 'error');
+                console.error('Remove from list error:', error);
+            }
+        }
+        
+        // Show message
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type;
+            messageDiv.textContent = message;
+            messageDiv.style.position = 'fixed';
+            messageDiv.style.top = '20px';
+            messageDiv.style.right = '20px';
+            messageDiv.style.zIndex = '1000';
+            messageDiv.style.padding = '10px 20px';
+            messageDiv.style.borderRadius = '5px';
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(messageDiv);
+            }, 3000);
+        }
+        
+        // Display Bing Shopping results
+        function displayBingResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            const products = data.products || [];
+            
+            if (products.length === 0) {
+                resultsDiv.innerHTML = '<div class="error">No Google Shopping results found. Try different keywords.</div>';
+                return;
+            }
+            
+            let html = '<div class="platform-section"><div class="platform-header"><div class="platform-name">🛒 Google Shopping - Real Products</div></div>';
+            
+            products.forEach(product => {
+                html += `
+                    <div class="online-item-card" onclick="window.open('${product.product_url}', '_blank')">
+                        <div class="online-item-header">
+                            <div>
+                                <div class="online-item-name">${product.name}</div>
+                                <div class="online-item-brand">${product.seller}</div>
+                            </div>
+                            <div class="online-item-price">
+                                <div class="current-price">${product.price}</div>
+                                ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
+                                ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="online-item-details">
+                            <div class="rating">
+                                <span class="rating-stars">⭐</span>
+                                <span>${product.rating || 'N/A'}</span>
+                            </div>
+                            <div>${product.delivery || 'N/A'}</div>
+                            <div>${product.availability || 'Check availability'}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Display combined real results
+        function displayCombinedRealResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            let html = '';
+            
+            // Show recommendations
+            if (data.recommendations) {
+                html += `
+                    <div class="best-deals-section">
+                        <div class="best-deals-title">
+                            💡 Smart Recommendations for "${data.query}"
+                        </div>
+                `;
+                
+                if (data.recommendations.best_local) {
+                    const item = data.recommendations.best_local;
+                    html += `
+                        <div class="online-item-card">
+                            <div class="online-item-header">
+                                <div>
+                                    <div class="online-item-name">📦 Best Local: ${item.name}</div>
+                                    <div class="online-item-brand">Local Database</div>
+                                </div>
+                                <div class="online-item-price">
+                                    <div class="current-price">${item.price_range}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (data.recommendations.cheapest_online) {
+                    const item = data.recommendations.cheapest_online;
+                    html += `
+                        <div class="online-item-card">
+                            <div class="online-item-header">
+                                <div>
+                                    <div class="online-item-name">💰 Cheapest Online: ${item.name}</div>
+                                    <div class="online-item-brand">${item.seller}</div>
+                                </div>
+                                <div class="online-item-price">
+                                    <div class="current-price">${item.price}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+            }
+            
+            // Show local items
+            if (data.local_items && data.local_items.length > 0) {
+                html += `
+                    <div class="platform-section">
+                        <div class="platform-header">
+                            <div class="platform-name">📦 Local Database</div>
+                            <div class="delivery-time">Instant</div>
+                        </div>
+                `;
+                
+                data.local_items.slice(0, 3).forEach(item => {
+                    const hindiNames = item.hindi_names.join(', ');
+                    html += `
+                        <div class="item-card" onclick="addToList('${item.id}', '${item.name}')">
+                            <div class="item-name">${item.name}</div>
+                            <div class="item-hindi">${hindiNames}</div>
+                            <div class="item-details">
+                                <span class="item-category">${item.category}</span>
+                                <span class="item-price">${item.price_range}</span>
+                                <button class="add-btn" onclick="event.stopPropagation(); addToList('${item.id}', '${item.name}')">Add</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            if (html === '') {
+                html = '<div class="error">No results found. Try different keywords.</div>';
+            }
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Display DuckDuckGo Shopping results
+        function displayDuckDuckGoResults(data) {
+            const resultsDiv = document.getElementById('searchResults');
+            const products = data.products || [];
+            
+            if (products.length === 0) {
+                resultsDiv.innerHTML = '<div class="error">No DuckDuckGo Shopping results found. Try different keywords like: palak, doodh, chawal, paneer</div>';
+                return;
+            }
+            
+            let html = `
+                <div class="platform-section">
+                    <div class="platform-header">
+                        <div class="platform-name">🦆 DuckDuckGo Shopping - Privacy-Focused Results</div>
+                        <div class="delivery-time">Real Products</div>
+                    </div>
+            `;
+            
+            // Add privacy note
+            if (data.privacy_note) {
+                html += `
+                    <div class="best-deals-section">
+                        <div class="best-deals-title">
+                            🔒 ${data.privacy_note}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            products.forEach(product => {
+                html += `
+                    <div class="online-item-card" onclick="window.open('${product.product_url}', '_blank')">
+                        <div class="online-item-header">
+                            <div>
+                                <div class="online-item-name">${product.name}</div>
+                                <div class="online-item-brand">${product.seller}</div>
+                            </div>
+                            <div class="online-item-price">
+                                <div class="current-price">${product.price}</div>
+                                ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
+                                ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="online-item-details">
+                            <div class="rating">
+                                <span class="rating-stars">⭐</span>
+                                <span>${product.rating || 'N/A'} (${product.reviews || 0} reviews)</span>
+                            </div>
+                            <div>📦 ${product.delivery || 'N/A'}</div>
+                            <div>✅ ${product.availability || 'Check availability'}</div>
+                        </div>
+                        ${product.description ? `<div class="item-description">${product.description}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            resultsDiv.innerHTML = html;
+        }
+        
+        // Handle Enter key in search input
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchItems();
+            }
+        });
+    </script>
+</body>
+</html>
