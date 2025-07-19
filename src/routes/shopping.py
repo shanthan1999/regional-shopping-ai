@@ -13,8 +13,13 @@ import hashlib
 import time
 import re
 from datetime import datetime
-from src.services.product_search import product_search_service
-from src.services.duckduckgo_shopping_search import duckduckgo_shopping_service
+# Import services directly
+from src.services.duckduckgo_shopping_search import DuckDuckGoShoppingService
+from src.services.product_search import ProductSearchService
+
+# Initialize services
+duckduckgo_shopping_service = DuckDuckGoShoppingService()
+product_search_service = ProductSearchService()
 
 shopping_bp = Blueprint('shopping', __name__)
 
@@ -513,6 +518,55 @@ def get_shopping_list(list_id):
     
     except Exception as e:
         print(f"Error in get_shopping_list: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@shopping_bp.route('/list/<list_id>/remove/<int:item_index>', methods=['DELETE'])
+@cross_origin()
+def remove_from_shopping_list(list_id, item_index):
+    """Remove item from shopping list by index."""
+    try:
+        if list_id not in shopping_lists:
+            return jsonify({'error': 'Shopping list not found'}), 404
+        
+        shopping_list = shopping_lists[list_id]
+        
+        if item_index < 0 or item_index >= len(shopping_list['items']):
+            return jsonify({'error': 'Invalid item index'}), 400
+        
+        # Remove the item
+        removed_item = shopping_list['items'].pop(item_index)
+        shopping_list['updated_at'] = datetime.now().isoformat()
+        
+        return jsonify({
+            'message': 'Item removed from shopping list',
+            'removed_item': removed_item,
+            'list': shopping_list
+        })
+    
+    except Exception as e:
+        print(f"Error in remove_from_shopping_list: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@shopping_bp.route('/list/<list_id>/clear', methods=['DELETE'])
+@cross_origin()
+def clear_shopping_list(list_id):
+    """Clear all items from shopping list."""
+    try:
+        if list_id not in shopping_lists:
+            return jsonify({'error': 'Shopping list not found'}), 404
+        
+        shopping_list = shopping_lists[list_id]
+        shopping_list['items'] = []
+        shopping_list['updated_at'] = datetime.now().isoformat()
+        shopping_list['total_estimated_cost'] = 0
+        
+        return jsonify({
+            'message': 'Shopping list cleared',
+            'list': shopping_list
+        })
+    
+    except Exception as e:
+        print(f"Error in clear_shopping_list: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 # Initialize models when the module is imported

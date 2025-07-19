@@ -3,8 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multilingual Shopping List Demo</title>
+    <title>Regional Shopping AI - Smart Multilingual Shopping Assistant</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
     <style>
+        :root {
+            --primary-color: #4CAF50;
+            --primary-dark: #45a049;
+            --secondary-color: #2196F3;
+            --accent-color: #FF9800;
+            --error-color: #f44336;
+            --success-color: #4CAF50;
+            --warning-color: #ff9800;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --background-light: #f8f9fa;
+            --border-color: #e9ecef;
+            --shadow: 0 2px 10px rgba(0,0,0,0.1);
+            --shadow-hover: 0 4px 20px rgba(0,0,0,0.15);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,78 +31,94 @@
         }
         
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
+            line-height: 1.6;
         }
         
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
+            padding: 20px;
         }
         
-        .header {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            color: white;
+        .app-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
             padding: 30px;
             text-align: center;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
         }
         
-        .header h1 {
-            font-size: 2.5em;
+        .app-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
             margin-bottom: 10px;
         }
         
-        .header p {
-            font-size: 1.2em;
-            opacity: 0.9;
+        .app-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 400;
         }
         
-        .main-content {
+        .main-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
             padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
         }
         
-        .search-section, .list-section {
-            background: #f8f9fa;
-            padding: 25px;
-            border-radius: 10px;
-            border: 1px solid #e9ecef;
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            transform: translateY(-2px);
         }
         
-        .section-title {
-            font-size: 1.5em;
-            color: #333;
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 20px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
         
-        .search-box {
+        .search-container {
             position: relative;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         
         .search-input {
             width: 100%;
-            padding: 15px 20px;
-            border: 2px solid #ddd;
+            padding: 15px 50px 15px 20px;
+            border: 2px solid var(--border-color);
             border-radius: 25px;
             font-size: 16px;
             outline: none;
-            transition: border-color 0.3s;
+            transition: var(--transition);
+            background: white;
         }
         
         .search-input:focus {
-            border-color: #4CAF50;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
         }
         
         .search-btn {
@@ -91,1171 +126,773 @@
             right: 5px;
             top: 50%;
             transform: translateY(-50%);
-            background: #4CAF50;
+            background: var(--primary-color);
             color: white;
             border: none;
             padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: var(--transition);
+            font-weight: 500;
         }
         
         .search-btn:hover {
-            background: #45a049;
+            background: var(--primary-dark);
         }
         
-        .examples {
-            margin-bottom: 20px;
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
-        .example-tags {
+        .tabs {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        .example-tag {
-            background: #e3f2fd;
-            color: #1976d2;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.9em;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .example-tag:hover {
-            background: #1976d2;
-            color: white;
-        }
-        
-        .results {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .item-card {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 10px;
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .item-card:hover {
-            border-color: #4CAF50;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
-        }
-        
-        .item-name {
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 5px;
-        }
-        
-        .item-hindi {
-            color: #666;
-            font-style: italic;
-            margin-bottom: 5px;
-        }
-        
-        .item-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.9em;
-        }
-        
-        .item-category {
-            background: #f0f0f0;
-            padding: 2px 8px;
-            border-radius: 10px;
-            color: #666;
-        }
-        
-        .item-price {
-            color: #4CAF50;
-            font-weight: bold;
-        }
-        
-        .add-btn {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-        
-        .shopping-list {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .list-item:last-child {
-            border-bottom: none;
-        }
-        
-        .list-item-info {
-            flex: 1;
-        }
-        
-        .list-item-name {
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .list-item-details {
-            font-size: 0.9em;
-            color: #666;
-        }
-        
-        .remove-btn {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.8em;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        
-        .error {
-            background: #ffebee;
-            color: #c62828;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        
-        .success {
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-        
-        .stats {
-            background: #f0f0f0;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        
-        .search-tabs {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 20px;
-            background: #e9ecef;
+            background: var(--background-light);
             border-radius: 25px;
             padding: 5px;
+            margin-bottom: 20px;
         }
         
         .tab-btn {
             flex: 1;
-            padding: 10px 15px;
+            padding: 12px 16px;
             border: none;
             background: transparent;
             border-radius: 20px;
             cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.9em;
-            color: #666;
+            transition: var(--transition);
+            font-weight: 500;
+            color: var(--text-secondary);
         }
         
         .tab-btn.active {
-            background: #4CAF50;
+            background: var(-);
+         
+        
+        }
+        
+        .example-tags {
+            display: flex;
+            flex-wrap: w
+         8px;
+        
+        }
+        
+        .example-tag {
+         );
+        imary);
+            paddinpx;
+            border-radius: 20px;
+            font-size: 0.;
+            cursor: point
+            transition: var(--tion);
+            border: 1px solid v
+        }
+        
+        .er {
+        lor);
             color: white;
+            border-color: var(;
         }
         
-        .tab-btn:hover:not(.active) {
-            background: #f0f0f0;
+        .results-container {
+            max-height: 500px;
+         to;
+        n;
+            scrollba);
         }
         
-        .platform-section {
-            margin-bottom: 20px;
+        .results-container::-web
+            width: 6px;
         }
         
-        .platform-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #4CAF50;
+        
+            background: var(--b;
+            border-radius: 3px;
         }
         
-        .platform-logo {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
+        .results-containehumb {
+            backgrouolor);
+         x;
         }
         
-        .platform-name {
-            font-weight: bold;
-            color: #333;
+        .product-card {
+            background: 
+         -color);
+        dius);
+            padding: 20px;
+            margin-bottom: 15x;
+            transition: 
+         er;
         }
         
-        .delivery-time {
-            font-size: 0.8em;
-            color: #666;
-            margin-left: auto;
+        .product-card:hover {
+            border-color:;
+            box-shadow: vow);
+            transform: translapx);
         }
         
-        .online-item-card {
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 8px;
-            transition: all 0.3s;
-            cursor: pointer;
+        .product-header {
+         
+        tween;
+            align-rt;
+            margin-bottom: 10px
         }
         
-        .online-item-card:hover {
-            border-color: #4CAF50;
-            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+        .e {
+        ;
+            colo;
+            font-size: 1.1rem;
+            margin-bottom: px;
         }
         
-        .online-item-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 8px;
+        .product-brand {
+         );
+        rem;
+            font-w
         }
         
-        .online-item-name {
-            font-weight: bold;
-            color: #333;
-            font-size: 0.95em;
-        }
-        
-        .online-item-brand {
-            font-size: 0.8em;
-            color: #666;
-        }
-        
-        .online-item-price {
+        .product-price {
             text-align: right;
         }
         
-        .current-price {
-            font-weight: bold;
-            color: #4CAF50;
-            font-size: 1.1em;
+        ice {
+            font
+            color: var(--primarycolor);
+            font-size: 1.2rem;
         }
         
         .original-price {
-            text-decoration: line-through;
-            color: #999;
-            font-size: 0.9em;
+         
+        ;
+            font-size:;
         }
         
-        .discount {
-            background: #ff4444;
+        .discount-badge {
+            background: var(--err);
             color: white;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.8em;
+            padding: 4px 
+         px;
+         0.8rem;
+            font-w 500;
         }
         
-        .online-item-details {
+        .product-details {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85em;
-            color: #666;
+            justify-content: spa
+            align-items: cen
+            margin-top: 15px;
+            padding-top: 15px
+            border-top: 
         }
         
         .rating {
             display: flex;
-            align-items: center;
-            gap: 4px;
+            align-items: 
+         
+        y);
         }
         
-        .rating-stars {
-            color: #ffa500;
+        .rs {
+        #ffa500;
         }
         
-        .best-deals-section {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 8px;
+        .
+        
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-rad
+            cursor: pointer;
+            font-weight: 5;
+            transition: var(--trn);
+        }
+        
+        .
+        
+            transform: t
+        }
+        
+        .shopping-list {
+         e;
+        dius);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        
+            background: ;
             padding: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .best-deals-title {
-            font-weight: bold;
-            color: #856404;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .price-comparison {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .platform-comparison {
-            background: white;
-            padding: 10px;
-            border-radius: 6px;
+            border-radiu
             text-align: center;
-            border: 1px solid #ddd;
+         
+        t: 500;
+            color: var(--te;
         }
         
-        .platform-comparison h4 {
-            color: #333;
-            margin-bottom: 5px;
-            font-size: 0.9em;
+        .list-item {
+            display: flex;
+            justify-content: spen;
+            align-items: center;
+            padding: 15px 20
+         
+        ion);
         }
         
-        .comparison-price {
-            color: #4CAF50;
-            font-weight: bold;
+        .list-item:hover {
+         ;
+        
+        
+        .list-item:last-ch{
+            border-bottom: none;
         }
         
-        .comparison-delivery {
-            font-size: 0.8em;
-            color: #666;
+        .{
+        
+        }
+        
+        .list-item-name {
+            font-weight: 600;
+         ;
+        : 5px;
+        }
+        
+        .list-item-detai
+          0.9rem;
+        condary);
+        }
+        
+        .{
+        
+            color: white
+            border: none;
+            padding: 6px 12px;
+            border-radius: 15px;
+         er;
+        m;
+            transition: vsition);
+        }
+        
+        .remove-btn:hover {
+         f2f;
+        
+        
+        .loading {
+            text-align: cer;
+            padding: 40px 20p
+            color: var(--text-s
+        }
+        
+        {
+            content: '';
+            display: inlin
+            width: 20px;
+            height: 20px;
+            border: 2px solid r-color);
+            border-top: 
+         50%;
+        ;
+            margi
+        }
+        
+        @keyframes spin {
+         0deg); }
+        ); }
+        }
+        
+        .{
+        ;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: var(s);
+            color: white;
+            font-weight: 500;
+         1000;
+        
+        }
+        
+        .message.success {
+            background: var(--su;
+        }
+        
+        .message.erro{
+         ;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transf);
+                opacity: 0;
+          }
+        
+                transform: tra
+                opacity: 1;
+            }
+        }
+        
+        .empty-state {
+         
+        20px;
+            color: var(--text-sec;
+        }
+        
+        .empty-state-icon {
+         e: 3rem;
+        ;
+            opacity: 0.5;
+        }
+        
+        .es-grid {
+        id;
+            grid-template-colufr));
+            gap: 20px;
+            margin-top: ;
+        }
+        
+        .feature-card {
+            background: rgb
+            padding: 25px;
+            bius);
+            
+            transition: ion);
+        }
+        
+        .fea {
+            transform: px);
+            box-shadow: var(--s
+        }
+        
+        .fea{
+       
+       15px;
+        }
+        
+        .feature-title {
+            font-size: 1.2rem;
+            fo
+        px;
+            color: var(--text-prim
+        }
+        
+        .feature{
+            color: var(--text-secondary);
+            line-height: 1.5;
         }
         
         @media (max-width: 768px) {
-            .main-content {
+            .main-grid {
                 grid-template-columns: 1fr;
             }
             
-            .header h1 {
-                font-size: 2em;
+            .appe {
+                font-size: 2rem;
             }
             
-            .header p {
-                font-size: 1em;
+            .container {
+                padding: 15px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .tabs {
+                ;
+                gap: 5px;
+            }
+            
+            .example-tags {
+                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>🛒 Multilingual Shopping List</h1>
-            <p>Search for items in Hindi (English letters) and build your shopping list</p>
-        </div>
+        <header class="app-header">
+            <h1 class="app-title">🛒 Regional Shopping AI</h1>
+            <p class="aprch</p>
+        </header>
         
-        <div class="main-content">
-            <div class="search-section">
-                <h2 class="section-title">🔍 Search Items</h2>
+        <div cgrid">
+          >
+rch</h2>
+            
+                <div class="tabs"
+                    <button class="
+                    <button class="tabutton>
+         </div>
                 
-                <div class="search-tabs">
-                    <button class="tab-btn active" onclick="switchTab('duckduckgo')">🦆 DuckDuckGo Shopping</button>
+                <div class="search-c">
+                    <input type="" 
+          .">
+        >
                 </div>
                 
-                <div class="search-box">
-                    <input type="text" id="searchInput" class="search-input" 
-                           placeholder="Type in Hindi: palak, bhindi, doodh, chawal...">
-                    <button class="search-btn" onclick="searchItems()">Search</button>
+                <div class="e>
+            an>
+                    <span class="an>
+                    <span class="example-tag" data-query="doodh">doodh</span>
+                    <span class="example-tag" datpan>
+            </span>
+                    <span class="exam
                 </div>
                 
-                <div class="examples">
-                    <p><strong>Try these examples:</strong></p>
-                    <div class="example-tags">
-                        <span class="example-tag" onclick="searchExample('palak')">palak</span>
-                        <span class="example-tag" onclick="searchExample('bhindi')">bhindi</span>
-                        <span class="example-tag" onclick="searchExample('doodh')">doodh</span>
-                        <span class="example-tag" onclick="searchExample('chawal')">chawal</span>
-                        <span class="example-tag" onclick="searchExample('paneer')">paneer</span>
-                        <span class="example-tag" onclick="searchExample('kothimbir')">kothimbir</span>
-                        <span class="example-tag" onclick="searchExample('adrak lehsun')">adrak lehsun</span>
-                    </div>
+                <div id="searchResults
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+         tarted</p>
+        iv>
                 </div>
-                
-                <div id="searchResults" class="results"></div>
             </div>
             
-            <div class="list-section">
-                <h2 class="section-title">📝 Shopping List</h2>
+            <div class="card">
+                <h2 class="card-tith2>
                 
-                <div class="stats">
-                    <div id="listStats">No items in list</div>
+                <div class="list-stats" id="listStats">
+                    No in list
                 </div>
                 
-                <div id="shoppingList" class="shopping-list">
-                    <p style="text-align: center; color: #666; padding: 20px;">
-                        Your shopping list is empty. Search and add items!
-                    </p>
+                <div ist">
+                   state">
+                iv>
+                        <p>Your sh
+                    </div>
                 </div>
+            </div>
+        </div>
+        
+        <div clas">
+            <div class="featu">
+                <div class="feature-icon">🌐</div>
+             /h3>
+         ts</p>
+        div>
+            <div class="feature-card">
+                <div class="feature-ic">🤖</div>
+                <h3 class="feature-title">AI-Powered</h3>
+                <p class="featunding</p>
+            
+            <div class="feature-card">
+                <div class="feature-icon">🛍️</div>
+            </h3>
+                <ms</p>
             </div>
         </div>
     </div>
 
     <script>
-        let currentListId = null;
-        let shoppingListItems = [];
-        let currentTab = 'duckduckgo';
-        
-        // Initialize shopping list on page load
-        window.onload = function() {
-            createShoppingList();
-        };
-        
-        // Switch between search tabs
-        function switchTab(tab) {
-            currentTab = tab;
+        class ShApp {
+            constructor() {
+                this.currentTab = '
+                this.currentLinull;
+                this.shoppingListItems = [];
+                this.i;
+                
+                this.initializeEventLrs();
+                this.createShopp
+            }
             
-            // Update tab buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            // Clear previous results
-            document.getElementById('searchResults').innerHTML = '';
-            
-            // Update placeholder text
-            const searchInput = document.getElementById('searchInput');
-            searchInput.placeholder = '🦆 Search DuckDuckGo for real products in Hindi: palak, bhindi, doodh...';
-        }
-        
-        // Create a new shopping list
-        async function createShoppingList() {
-            try {
-                const response = await fetch('/api/shopping/list', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        name: 'My Shopping List'
-                    })
+            init() {
+                // Tab switching
+                document.querySelectorAll('.tab-btn').f => {
+                    btn.addEventListener('click', (e) => this.switchT);
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    currentListId = data.list.id;
-                    console.log('Shopping list created:', currentListId);
-                } else {
-                    console.error('Failed to create shopping list');
-                }
-            } catch (error) {
-                console.error('Error creating shopping list:', error);
-            }
-        }
-        
-        // Search for items based on current tab
-        async function searchItems() {
-            const query = document.getElementById('searchInput').value.trim();
-            if (!query) return;
-            
-            const resultsDiv = document.getElementById('searchResults');
-            resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
-            
-            try {
-                let endpoint, displayFunction;
-                
-                // Only DuckDuckGo Shopping
-                endpoint = '/api/shopping/search/duckduckgo';
-                displayFunction = displayDuckDuckGoResults;
-                
-                const response = await fetch(endpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: query,
-                        limit: 8
-                    })
+                // Search functionality
+                document.getElementById('searchBtn').addEvenducts());
+                document.getElementById('searchInput').addEvent> {
+                    if (e.key === 'Enter') this.searchProducts();
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(`${currentTab} API Response:`, data);
-                    displayFunction(data);
-                } else {
-                    console.error(`${currentTab} API Error:`, response.status, response.statusText);
-                    const errorText = await response.text();
-                    console.error('Error details:', errorText);
-                    resultsDiv.innerHTML = `<div class="error">Search failed (${response.status}). Please try again.</div>`;
-                }
-            } catch (error) {
-                resultsDiv.innerHTML = '<div class="error">Network error. Please check your connection.</div>';
-                console.error('Search error:', error);
-            }
-        }
+                // Example tags
+                document.querySelectorAll('.example-ta> {
+             
+             });
         
-        // Display local search results
-        function displayLocalResults(data) {
-            const resultsDiv = document.getElementById('searchResults');
-            const items = data.items || [];
             
-            if (items.length === 0) {
-                resultsDiv.innerHTML = '<div class="error">No items found. Try different keywords.</div>';
-                return;
-            }
-            
-            let html = '';
-            items.forEach(item => {
-                const hindiNames = item.hindi_names.join(', ');
-                html += `
-                    <div class="item-card" onclick="addToList('${item.id}', '${item.name}')">
-                        <div class="item-name">${item.name}</div>
-                        <div class="item-hindi">${hindiNames}</div>
-                        <div class="item-details">
-                            <span class="item-category">${item.category}</span>
-                            <span class="item-price">${item.price_range}</span>
-                            <button class="add-btn" onclick="event.stopPropagation(); addToList('${item.id}', '${item.name}')">Add</button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            resultsDiv.innerHTML = html;
-        }
-        
-        // Display online search results
-        function displayOnlineResults(data) {
-            const resultsDiv = document.getElementById('searchResults');
-            const platforms = data.platforms || {};
-            
-            let html = '';
-            
-            // Show best deals section if available
-            if (data.best_deals && data.best_deals.length > 0) {
-                html += `
-                    <div class="best-deals-section">
-                        <div class="best-deals-title">
-                            🔥 Best Deals for "${data.query}"
-                        </div>
-                        <div class="online-item-card">
-                            <div class="online-item-header">
-                                <div>
-                                    <div class="online-item-name">${data.best_deals[0].name}</div>
-                                    <div class="online-item-brand">${data.best_deals[0].brand}</div>
-                                </div>
-                                <div class="online-item-price">
-                                    <div class="current-price">${data.best_deals[0].price}</div>
-                                    ${data.best_deals[0].original_price ? `<div class="original-price">${data.best_deals[0].original_price}</div>` : ''}
-                                    ${data.best_deals[0].discount ? `<div class="discount">${data.best_deals[0].discount}</div>` : ''}
-                                </div>
-                            </div>
-                            <div class="online-item-details">
-                                <div class="rating">
-                                    <span class="rating-stars">⭐</span>
-                                    <span>${data.best_deals[0].rating || 'N/A'}</span>
-                                </div>
-                                <div>${data.best_deals[0].delivery_time || 'N/A'}</div>
-                                <div>${data.best_deals[0].platform}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            // Show price comparison
-            if (data.price_comparison && Object.keys(data.price_comparison).length > 0) {
-                html += `
-                    <div class="price-comparison">
-                `;
+            switchTab(tab) {
+                this.currentTab = tab;
                 
-                Object.entries(data.price_comparison).forEach(([platform, info]) => {
-                    html += `
-                        <div class="platform-comparison">
-                            <h4>${platform.charAt(0).toUpperCase() + platform.slice(1)}</h4>
-                            <div class="comparison-price">${info.average_price}</div>
-                            <div class="comparison-delivery">${info.fastest_delivery}</div>
-                        </div>
-                    `;
-                });
+            b
+                document.querySelecto
+                document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
                 
-                html += `</div>`;
+             ts
+            ts();
+                
+                // Update placehold
+                const input = document.getElementById('searchInt');
+                input.plakgo' 
+                    ? 'Search live products: palak, bhindi, doodh...'
+                    : 'Search local database: palak, bhindi, dood';
             }
             
-            // Show platform-wise results
-            Object.entries(platforms).forEach(([platformName, products]) => {
-                if (products && products.length > 0) {
-                    html += `
-                        <div class="platform-section">
-                            <div class="platform-header">
-                                <div class="platform-name">${platformName.charAt(0).toUpperCase() + platformName.slice(1)}</div>
-                                <div class="delivery-time">${products[0].delivery_time || 'N/A'}</div>
-                            </div>
-                    `;
+            async createShoppingList() {
+                try {
+                    const response = await fetch('/api/shopping/list', {
+                        method,
+                        he },
+                  List' })
+               });
                     
-                    products.forEach(product => {
-                        html += `
-                            <div class="online-item-card" onclick="addOnlineItemToList('${product.name}', '${platformName}')">
-                                <div class="online-item-header">
-                                    <div>
-                                        <div class="online-item-name">${product.name}</div>
-                                        <div class="online-item-brand">${product.brand || ''}</div>
-                                    </div>
-                                    <div class="online-item-price">
-                                        <div class="current-price">${product.price}</div>
-                                        ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
-                                        ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
-                                    </div>
-                                </div>
-                                <div class="online-item-details">
-                                    <div class="rating">
-                                        <span class="rating-stars">⭐</span>
-                                        <span>${product.rating || 'N/A'}</span>
-                                    </div>
-                                    <div>${product.quantity || 'N/A'}</div>
-                                    <div>${product.availability || 'Check availability'}</div>
-                                </div>
-                            </div>
-                        `;
+                    if (response.ok) {
+         
+        d;
+                    }
+                } catch (error) {
+                    console.error('Error creating shopping list:', error);
+                }
+            }
+            
+            ts() {
+                const query = document.getElementByim();
+                if (!query || this.isSearching) return;
+                
+                this.isSearching = true;
+                this.showLoading();
+                this.updateSearchButton(true);
+                
+                try {
+                    const endpoint = this.currentTab === 'du' 
+                        ? '/api/shoppckgo'
+                        : '/api/shopping/search';
+                    
+                    const response = at, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ query, limit: 8 })
                     });
                     
-                    html += `</div>`;
-                }
-            });
-            
-            if (html === '') {
-                html = '<div class="error">No online products found. Try different keywords.</div>';
-            }
-            
-            resultsDiv.innerHTML = html;
-        }
-        
-        // Display combined search results
-        function displayCombinedResults(data) {
-            const resultsDiv = document.getElementById('searchResults');
-            let html = '';
-            
-            // Show recommendations section
-            if (data.recommendations) {
-                html += `
-                    <div class="best-deals-section">
-                        <div class="best-deals-title">
-                            💡 Smart Recommendations for "${data.query}"
-                        </div>
-                `;
-                
-                if (data.recommendations.best_price) {
-                    html += `
-                        <div class="online-item-card">
-                            <div class="online-item-header">
-                                <div>
-                                    <div class="online-item-name">💰 Best Price: ${data.recommendations.best_price.name}</div>
-                                    <div class="online-item-brand">${data.recommendations.best_price.platform}</div>
-                                </div>
-                                <div class="online-item-price">
-                                    <div class="current-price">${data.recommendations.best_price.price}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                if (data.recommendations.fastest_delivery) {
-                    html += `
-                        <div class="online-item-card">
-                            <div class="online-item-header">
-                                <div>
-                                    <div class="online-item-name">⚡ Fastest Delivery: ${data.recommendations.fastest_delivery.name}</div>
-                                    <div class="online-item-brand">${data.recommendations.fastest_delivery.platform}</div>
-                                </div>
-                                <div class="online-item-price">
-                                    <div class="current-price">${data.recommendations.fastest_delivery.delivery_time}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                html += `</div>`;
-            }
-            
-            // Show local items first
-            if (data.local_items && data.local_items.length > 0) {
-                html += `
-                    <div class="platform-section">
-                        <div class="platform-header">
-                            <div class="platform-name">📦 Local Database</div>
-                            <div class="delivery-time">Instant</div>
-                        </div>
-                `;
-                
-                data.local_items.slice(0, 3).forEach(item => {
-                    const hindiNames = item.hindi_names.join(', ');
-                    html += `
-                        <div class="item-card" onclick="addToList('${item.id}', '${item.name}')">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-hindi">${hindiNames}</div>
-                            <div class="item-details">
-                                <span class="item-category">${item.category}</span>
-                                <span class="item-price">${item.price_range}</span>
-                                <button class="add-btn" onclick="event.stopPropagation(); addToList('${item.id}', '${item.name}')">Add</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-            }
-            
-            // Show online platforms
-            if (data.online_platforms) {
-                Object.entries(data.online_platforms).forEach(([platformName, products]) => {
-                    if (products && products.length > 0) {
-                        html += `
-                            <div class="platform-section">
-                                <div class="platform-header">
-                                    <div class="platform-name">🛒 ${platformName.charAt(0).toUpperCase() + platformName.slice(1)}</div>
-                                    <div class="delivery-time">${products[0].delivery_time || 'N/A'}</div>
-                                </div>
-                        `;
-                        
-                        products.slice(0, 2).forEach(product => {
-                            html += `
-                                <div class="online-item-card" onclick="addOnlineItemToList('${product.name}', '${platformName}')">
-                                    <div class="online-item-header">
-                                        <div>
-                                            <div class="online-item-name">${product.name}</div>
-                                            <div class="online-item-brand">${product.brand || ''}</div>
-                                        </div>
-                                        <div class="online-item-price">
-                                            <div class="current-price">${product.price}</div>
-                                            ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
-                                        </div>
-                                    </div>
-                                    <div class="online-item-details">
-                                        <div class="rating">
-                                            <span class="rating-stars">⭐</span>
-                                            <span>${product.rating || 'N/A'}</span>
-                                        </div>
-                                        <div>${product.quantity || 'N/A'}</div>
-                                    </div>
-                                </div>
-                            `;
-                        });
-                        
-                        html += `</div>`;
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.displayResults(data);
+                    } else {
+                        this.showError('Search failed. Please try again.');
                     }
-                });
+                } catch (error) {
+                    this.showError('Network error. Please check your conn
+                } finally {
+                    this.isSease;
+                    this.u
+                }
             }
             
-            if (html === '') {
-                html = '<div class="error">No results found. Try different keywords.</div>';
+            searchExample(query) {
+                document.getElementById('searchInput').value = query;
+                this.sears();
             }
             
-            resultsDiv.innerHTML = html;
-        }
-        
-        // Display DuckDuckGo Shopping results
-        function displayDuckDuckGoResults(data) {
-            const resultsDiv = document.getElementById('searchResults');
-            const products = data.products || [];
-            
-            if (products.length === 0) {
-                resultsDiv.innerHTML = '<div class="error">No DuckDuckGo Shopping results found. Try different keywords.</div>';
-                return;
+            dispata) {
+                const container = document.getElementById('searchResults');
+                
+                if (this.currentTab === 'duckduckgo') {
+                    this.displayDuckDuckGoResults(data, container);
+                } else {
+                    this.displayLocalResults(data.items || [], container);
+                }
             }
             
-            let html = '<div class="platform-section"><div class="platform-header"><div class="platform-name">🦆 DuckDuckGo Shopping - Privacy-Friendly Search</div></div>';
+            disper) {
+                const products = | [];
+             
             
-            products.forEach(product => {
-                html += `
-                    <div class="online-item-card" style="position:relative;">
-                        <div onclick="window.open('${product.product_url}', '_blank')" style="cursor:pointer;">
-                            <div class="online-item-header">
-                                <div>
-                                    <div class="online-item-name">${product.name}</div>
-                                    <div class="online-item-brand">${product.seller}</div>
-                                </div>
-                                <div class="online-item-price">
-                                    <div class="current-price">${product.price}</div>
-                                    ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
-                                    ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
-                                </div>
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-ic
+                            <ds.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const 
+                    ')">
+                        <div class="product-header">
+                            <div>
+                                <div class="product-name">${product.name}</div>
+                                <div class="product-brand">${prov>
+                            </div>
+                            <div class="product-price">
+                                <div class="current-price">${product.price}</div>
+                                ${product. : ''}
+                                ${product.discount ? `<div class="d
                             </div>
                         </div>
-                        <div class="online-item-details">
-                            <div class="rating">
-                                <span class="rating-stars">⭐</span>
-                                <span>${product.rating || 'N/A'}</span>
+                        <div class="product-details">
+                            <div class="ra
+                                <span 
+                                <span>${product.rating || 'N/A'}<
                             </div>
-                            <div>${product.delivery || 'N/A'}</div>
-                            <div>${product.availability || 'Check availability'}</div>
+                            <button class="add-btn" onclick="event.stopProp">
+                                Add to List
+                            </button>
                         </div>
-                        ${product.description ? `<div style="font-size: 0.8em; color: #666; margin-top: 5px;">${product.description}</div>` : ''}
-                        <button class="add-btn" style="position:absolute;top:10px;right:10px;z-index:2;" onclick="event.stopPropagation(); addOnlineItemToList('${product.name}', 'DuckDuckGo')">Add to List</button>
                     </div>
-                `;
-            });
-            
-            html += '</div>';
-            resultsDiv.innerHTML = html;
-        }
-        
-        // Add online item to shopping list
-        async function addOnlineItemToList(itemName, platform) {
-            if (!currentListId) {
-                await createShoppingList();
-            }
-            
-            try {
-                const response = await fetch(`/api/shopping/list/${currentListId}/add`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: itemName,
-                        quantity: 1,
-                        platform: platform
-                    })
-                });
+                `).join('');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    shoppingListItems = data.list.items;
-                    updateShoppingListDisplay();
-                    showMessage(`${itemName} from ${platform} added to list!`, 'success');
-                } else {
-                    showMessage('Failed to add item', 'error');
-                }
-            } catch (error) {
-                showMessage('Network error', 'error');
-                console.error('Add to list error:', error);
-            }
-        }
-        
-        // Search with example query
-        function searchExample(query) {
-            document.getElementById('searchInput').value = query;
-            searchItems();
-        }
-        
-        // Add item to shopping list
-        async function addToList(itemId, itemName) {
-            if (!currentListId) {
-                await createShoppingList();
+                container.tml;
             }
             
-            try {
-                const response = await fetch(`/api/shopping/list/${currentListId}/add`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        query: itemName,
-                        quantity: 1
-                    })
-                });
+            displayLocalResults(itemsainer) {
+                i
+               L = `
+            
+                            <d">😔</div>
+                            <p>No items found. Try different keywords.</p>
+             
+              `;
+                    return;
+         }
+              
+                const html = items.map(ite=> `
+                    <div class="product-card" o
+                        <div class="product-header">
+                          
+            
+                                <div class=iv>
+                            </div>
+                         
+                                <div class="current-</div>
+                            </div>
+                        </div>
+                        <div s">
+                  
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    shoppingListItems = data.list.items;
-                    updateShoppingListDisplay();
-                    showMessage('Item added to list!', 'success');
-                } else {
-                    showMessage('Failed to add item', 'error');
+                        <div class="product-details">
+                            <>
+                                ${item.category}
+                            </div>
+                            <button c
+                                Add to List
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                container.innerHTMl;
+            }
+            
+            async
+                 {
+                    await this.createShoppingList();
                 }
-            } catch (error) {
-                showMessage('Network error', 'error');
-                console.error('Add to list error:', error);
+                
+                try {
+                    const response =  {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.str)
+                    });
+                    
+                    if (response.ok) {
+                        const data);
+                        this.s
+                      isplay();
+                 ;
+                se {
+                        this.show');
+                }
+            ror) {
+                    this.showMessage(
+                }
             }
-        }
-        
-        // Update shopping list display
-        function updateShoppingListDisplay() {
-            const listDiv = document.getElementById('shoppingList');
-            const statsDiv = document.getElementById('listStats');
             
-            if (shoppingListItems.length === 0) {
-                listDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">Your shopping list is empty. Search and add items!</p>';
-                statsDiv.innerHTML = 'No items in list';
-                return;
+            async removeFromList(index) {
+                try {
+                    const response = await fetch(`/api/shopping/list`, {
+                        method
+                   });
+                   
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.
+                        this.updateShoppingListDisplay();
+                        this.showMessage('Item removed', 'success');
+                    }
+                } catch (error) {
+                    this.showMessage('Failed to remove item', 'error');
+                }
             }
             
-            statsDiv.innerHTML = `${shoppingListItems.length} items in list`;
-            
-            let html = '';
-            shoppingListItems.forEach((item, index) => {
-                const hindiNames = item.hindi_names.join(', ');
-                html += `
-                    <div class="list-item">
+            updateShoppingList
+                const 
+                conats');
+                
+                if (this.shopping{
+             
+            te">
+                            <div claiv>
+                            <p>Your shop
+                        </div>
+                    `;
+                    statsContaine;
+                    return;
+                }
+                
+                statsContainer.textContent = `${this.shoppingListItems.length} items in list`;
+                
+                const html
+                    <divem">
                         <div class="list-item-info">
-                            <div class="list-item-name">${item.name}</div>
+                            <div clasv>
                             <div class="list-item-details">
-                                ${hindiNames} • ${item.quantity} ${item.unit} • ${item.estimated_price}
+                                ${item.hindi_names ? item.hindi_name
+                                ${item.quanti
                             </div>
                         </div>
-                        <button class="remove-btn" onclick="removeFromList(${index})">Remove</button>
+                        <button class="remove->
                     </div>
-                `;
-            });
-            
-            listDiv.innerHTML = html;
-        }
-        
-        // Remove item from shopping list
-        async function removeFromList(index) {
-            if (!currentListId) return;
-            
-            try {
-                const response = await fetch(`/api/shopping/list/${currentListId}/remove/${index}`, {
-                    method: 'DELETE'
-                });
+                `).join('');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    shoppingListItems = data.list.items;
-                    updateShoppingListDisplay();
-                    showMessage('Item removed from list', 'success');
-                } else {
-                    showMessage('Failed to remove item', 'error');
-                }
-            } catch (error) {
-                showMessage('Network error', 'error');
-                console.error('Remove from list error:', error);
-            }
-        }
-        
-        // Show message
-        function showMessage(message, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = type;
-            messageDiv.textContent = message;
-            messageDiv.style.position = 'fixed';
-            messageDiv.style.top = '20px';
-            messageDiv.style.right = '20px';
-            messageDiv.style.zIndex = '1000';
-            messageDiv.style.padding = '10px 20px';
-            messageDiv.style.borderRadius = '5px';
-            
-            document.body.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                document.body.removeChild(messageDiv);
-            }, 3000);
-        }
-        
-        // Display Bing Shopping results
-        function displayBingResults(data) {
-            const resultsDiv = document.getElementById('searchResults');
-            const products = data.products || [];
-            
-            if (products.length === 0) {
-                resultsDiv.innerHTML = '<div class="error">No Google Shopping results found. Try different keywords.</div>';
-                return;
+                listContainer.innerHTML = html;
             }
             
-            let html = '<div class="platform-section"><div class="platform-header"><div class="platform-name">🛒 Google Shopping - Real Products</div></div>';
-            
-            products.forEach(product => {
-                html += `
-                    <div class="online-item-card" onclick="window.open('${product.product_url}', '_blank')">
-                        <div class="online-item-header">
-                            <div>
-                                <div class="online-item-name">${product.name}</div>
-                                <div class="online-item-brand">${product.seller}</div>
-                            </div>
-                            <div class="online-item-price">
-                                <div class="current-price">${product.price}</div>
-                                ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
-                                ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
-                            </div>
-                        </div>
-                        <div class="online-item-details">
-                            <div class="rating">
-                                <span class="rating-stars">⭐</span>
-                                <span>${product.rating || 'N/A'}</span>
-                            </div>
-                            <div>${product.delivery || 'N/A'}</div>
-                            <div>${product.availability || 'Check availability'}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            resultsDiv.innerHTML = html;
-        }
-        
-        // Display combined real results
-        function displayCombinedRealResults(data) {
-            const resultsDiv = document.getElementById('searchResults');
-            let html = '';
-            
-            // Show recommendations
-            if (data.recommendations) {
-                html += `
-                    <div class="best-deals-section">
-                        <div class="best-deals-title">
-                            💡 Smart Recommendations for "${data.query}"
-                        </div>
-                `;
-                
-                if (data.recommendations.best_local) {
-                    const item = data.recommendations.best_local;
-                    html += `
-                        <div class="online-item-card">
-                            <div class="online-item-header">
-                                <div>
-                                    <div class="online-item-name">📦 Best Local: ${item.name}</div>
-                                    <div class="online-item-brand">Local Database</div>
-                                </div>
-                                <div class="online-item-price">
-                                    <div class="current-price">${item.price_range}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                if (data.recommendations.cheapest_online) {
-                    const item = data.recommendations.cheapest_online;
-                    html += `
-                        <div class="online-item-card">
-                            <div class="online-item-header">
-                                <div>
-                                    <div class="online-item-name">💰 Cheapest Online: ${item.name}</div>
-                                    <div class="online-item-brand">${item.seller}</div>
-                                </div>
-                                <div class="online-item-price">
-                                    <div class="current-price">${item.price}</div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                html += `</div>`;
+            showLoading() {
+                document.getElementById('searchResults').innerHTML = '<div clas/div>';
             }
             
-            // Show local items
-            if (data.local_items && data.local_items.length > 0) {
-                html += `
-                    <div class="platform-section">
-                        <div class="platform-header">
-                            <div class="platform-name">📦 Local Database</div>
-                            <div class="delivery-time">Instant</div>
-                        </div>
-                `;
-                
-                data.local_items.slice(0, 3).forEach(item => {
-                    const hindiNames = item.hindi_names.join(', ');
-                    html += `
-                        <div class="item-card" onclick="addToList('${item.id}', '${item.name}')">
-                            <div class="item-name">${item.name}</div>
-                            <div class="item-hindi">${hindiNames}</div>
-                            <div class="item-details">
-                                <span class="item-category">${item.category}</span>
-                                <span class="item-price">${item.price_range}</span>
-                                <button class="add-btn" onclick="event.stopPropagation(); addToList('${item.id}', '${item.name}')">Add</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += `</div>`;
-            }
-            
-            if (html === '') {
-                html = '<div class="error">No results found. Try different keywords.</div>';
-            }
-            
-            resultsDiv.innerHTML = html;
-        }
-        
-        // Display DuckDuckGo Shopping results
-        function displayDuckDuckGoResults(data) {
-            const resultsDiv = document.getElementById('searchResults');
-            const products = data.products || [];
-            
-            if (products.length === 0) {
-                resultsDiv.innerHTML = '<div class="error">No DuckDuckGo Shopping results found. Try different keywords like: palak, doodh, chawal, paneer</div>';
-                return;
-            }
-            
-            let html = `
-                <div class="platform-section">
-                    <div class="platform-header">
-                        <div class="platform-name">🦆 DuckDuckGo Shopping - Privacy-Focused Results</div>
-                        <div class="delivery-time">Real Products</div>
-                    </div>
-            `;
-            
-            // Add privacy note
-            if (data.privacy_note) {
-                html += `
-                    <div class="best-deals-section">
-                        <div class="best-deals-title">
-                            🔒 ${data.privacy_note}
-                        </div>
+            clearResults() {
+                document.getElementById('sHTML = `
+                    <div class="empty-te">
+                        <div c>
+                        <p></p>
                     </div>
                 `;
             }
             
-            products.forEach(product => {
-                html += `
-                    <div class="online-item-card" onclick="window.open('${product.product_url}', '_blank')">
-                        <div class="online-item-header">
-                            <div>
-                                <div class="online-item-name">${product.name}</div>
-                                <div class="online-item-brand">${product.seller}</div>
-                            </div>
-                            <div class="online-item-price">
-                                <div class="current-price">${product.price}</div>
-                                ${product.original_price ? `<div class="original-price">${product.original_price}</div>` : ''}
-                                ${product.discount ? `<div class="discount">${product.discount}</div>` : ''}
-                            </div>
-                        </div>
-                        <div class="online-item-details">
-                            <div class="rating">
-                                <span class="rating-stars">⭐</span>
-                                <span>${product.rating || 'N/A'} (${product.reviews || 0} reviews)</span>
-                            </div>
-                            <div>📦 ${product.delivery || 'N/A'}</div>
-                            <div>✅ ${product.availability || 'Check availability'}</div>
-                        </div>
-                        ${product.description ? `<div class="item-description">${product.description}</div>` : ''}
+            u) {
+            );
+                btn.disabled =ding;
+                btn.textContent = isLoading ? 'Searching...' : 'Search';
+            }
+            
+            showError(message) {
+         L = `
+        ">
+                        <div class="empty-stat</div>
+                        <p>${message}</p>
                     </div>
                 `;
-            });
+            }
             
-            html += '</div>';
-            resultsDiv.innerHTML = html;
+            showMessage(message, type) {
+                const m;
+             
+            ;
+                document.body.appendChild(messageEl);
+            
+                setTimeout(() => {
+                    if (dl)) {
+                        document.body.removeChild(messageEl);
+                    }
+                }, 3000);
+            }
         }
         
-        // Handle Enter key in search input
-        document.getElementById('searchInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                searchItems();
-            }
-        });
+        // Initialize the app
+        const app = new ShoppingApp();
     </script>
 </body>
 </html>
