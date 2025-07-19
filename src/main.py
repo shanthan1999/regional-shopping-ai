@@ -10,7 +10,7 @@ from src.models.user import db
 from src.routes.user import user_bp
 from src.routes.rag import rag_bp
 from src.routes.shopping import shopping_bp
-from src.services.duckduckgo_shopping_search import DuckDuckGoShoppingService
+from src.services.tavily_shopping_search import TavilyShoppingService
 from src.services.product_search import ProductSearchService
 from src.config import get_config
 
@@ -46,7 +46,7 @@ def handle_exception(e):
     return jsonify({'error': 'An unexpected error occurred'}), 500
 
 # Initialize services
-duckduckgo_shopping_service = DuckDuckGoShoppingService()
+tavily_shopping_service = TavilyShoppingService()
 product_search_service = ProductSearchService()
 
 app.register_blueprint(user_bp, url_prefix='/api')

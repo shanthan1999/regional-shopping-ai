@@ -25,8 +25,11 @@ class Config:
     LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO')
     
     # Service Configuration
-    ENABLE_DUCKDUCKGO_SEARCH = os.getenv('ENABLE_DUCKDUCKGO_SEARCH', 'true').lower() == 'true'
+    ENABLE_TAVILY_SEARCH = os.getenv('ENABLE_TAVILY_SEARCH', 'true').lower() == 'true'
     ENABLE_RAG_SERVICE = os.getenv('ENABLE_RAG_SERVICE', 'true').lower() == 'true'
+    
+    # Tavily API Configuration
+    TAVILY_API_KEY = os.getenv('TAVILY_API_KEY', '')
     
     # Model Configuration
     EMBEDDING_MODEL = os.getenv('EMBEDDING_MODEL', 'sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')

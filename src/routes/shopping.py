@@ -14,11 +14,11 @@ import time
 import re
 from datetime import datetime
 # Import services directly
-from src.services.duckduckgo_shopping_search import DuckDuckGoShoppingService
+from src.services.tavily_shopping_search import TavilyShoppingService
 from src.services.product_search import ProductSearchService
 
 # Initialize services
-duckduckgo_shopping_service = DuckDuckGoShoppingService()
+tavily_shopping_service = TavilyShoppingService()
 product_search_service = ProductSearchService()
 
 shopping_bp = Blueprint('shopping', __name__)
@@ -314,8 +314,8 @@ def search_items():
 
 @shopping_bp.route('/search/duckduckgo', methods=['POST'])
 @cross_origin()
-def search_duckduckgo_products():
-    """Search DuckDuckGo Shopping for real products with purchase links."""
+def search_tavily_products():
+    """Search Tavily for real products with working purchase links."""
     try:
         data = request.get_json()
         if not data or 'query' not in data:
@@ -327,18 +327,18 @@ def search_duckduckgo_products():
         
         limit = data.get('limit', 10)
         
-        # Use DuckDuckGo Shopping service
-        products = duckduckgo_shopping_service.search_products(query, limit)
+        # Use Tavily Shopping service
+        products = tavily_shopping_service.search_products(query, limit)
         
         return jsonify({
             'query': query,
             'products': products,
             'total_found': len(products),
-            'source': 'duckduckgo_shopping'
+            'source': 'tavily_search'
         })
     
     except Exception as e:
-        print(f"Error in search_duckduckgo_products: {str(e)}")
+        print(f"Error in search_tavily_products: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @shopping_bp.route('/search/online', methods=['POST'])
@@ -484,20 +484,20 @@ def search_combined_real():
         # Search local database
         local_items = search_shopping_items(query, top_k=limit)
         
-        # Search DuckDuckGo Shopping for real products
-        duckduckgo_products = duckduckgo_shopping_service.search_products(query, limit)
+        # Search Tavily Shopping for real products
+        tavily_products = tavily_shopping_service.search_products(query, limit)
         
         # Get price comparison
-        price_comparison = duckduckgo_shopping_service.get_price_comparison(query)
+        price_comparison = tavily_shopping_service.get_price_comparison(query)
         
         return jsonify({
             'query': query,
             'local_items': local_items,
-            'duckduckgo_products': duckduckgo_products,
+            'tavily_products': tavily_products,
             'price_comparison': price_comparison,
             'recommendations': {
                 'best_local': local_items[0] if local_items else None,
-                'best_online': duckduckgo_products[0] if duckduckgo_products else None,
+                'best_online': tavily_products[0] if tavily_products else None,
                 'cheapest_online': price_comparison.get('recommendations', {}).get('cheapest') if 'error' not in price_comparison else None
             }
         })
