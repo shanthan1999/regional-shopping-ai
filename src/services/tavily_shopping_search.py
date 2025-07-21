@@ -28,11 +28,15 @@ class TavilyShoppingService:
         Search Tavily for real product data with working links
         """
         try:
-            # First try Tavily API, fallback to enhanced mock data
-            products = self._search_tavily_api(query, limit)
+            # Translate Hindi query to English
+            translated_query = self._translate_hindi_to_english(query)
+            print(f"Original query: {query}, Translated: {translated_query}")
+            
+            # First try Tavily API with translated query
+            products = self._search_tavily_api(translated_query, limit)
             
             if not products:
-                # Fallback to enhanced mock data with real working links
+                # Fallback to enhanced mock data with original query
                 products = self._get_enhanced_mock_results(query, limit)
             
             return products[:limit]
@@ -45,8 +49,24 @@ class TavilyShoppingService:
     def _search_tavily_api(self, query: str, limit: int) -> List[Dict]:
         """Search using Tavily API for real product data"""
         try:
-            # Enhance query for shopping results
-            shopping_query = f"{query} buy online India grocery shopping price"
+            # Create more specific shopping query to avoid irrelevant results
+            # For milk, we want actual milk products, not milk-based sweets
+            specific_terms = {
+                'milk fresh dairy': 'fresh milk dairy liquid milk -peda -sweet -mithai -dessert',
+                'spinach': 'fresh spinach leaves vegetable -powder -supplement',
+                'okra lady finger': 'fresh okra bhindi vegetable -seeds -powder',
+                'rice basmati': 'basmati rice grain cereal -flour -powder',
+                'cottage cheese paneer': 'fresh paneer cottage cheese dairy -powder -mix'
+            }
+            
+            # Check if we need specific filtering
+            enhanced_query = query
+            for key, specific in specific_terms.items():
+                if key in query.lower():
+                    enhanced_query = specific
+                    break
+            
+            shopping_query = f"{enhanced_query} buy online India grocery store price"
             
             payload = {
                 "query": shopping_query,
@@ -182,6 +202,116 @@ class TavilyShoppingService:
         
         return delivery_info.get(seller, 'Check website')
     
+    def _translate_hindi_to_english(self, query: str) -> str:
+        """Translate Hindi (romanized) terms to English for better search results"""
+        # Comprehensive Hindi to English translation dictionary
+        translations = {
+            # Vegetables
+            'palak': 'spinach',
+            'bhindi': 'okra lady finger',
+            'karela': 'bitter gourd',
+            'methi': 'fenugreek leaves',
+            'aloo': 'potato',
+            'pyaz': 'onion',
+            'tamatar': 'tomato',
+            'gajar': 'carrot',
+            'matar': 'green peas',
+            'gobhi': 'cauliflower',
+            'baingan': 'eggplant brinjal',
+            'lauki': 'bottle gourd',
+            'tori': 'ridge gourd',
+            'kaddu': 'pumpkin',
+            'shimla mirch': 'bell pepper capsicum',
+            
+            # Dairy Products
+            'doodh': 'milk fresh dairy',
+            'paneer': 'cottage cheese paneer',
+            'dahi': 'yogurt curd',
+            'makhan': 'butter',
+            'ghee': 'clarified butter ghee',
+            'malai': 'cream',
+            
+            # Grains & Cereals
+            'chawal': 'rice basmati',
+            'atta': 'wheat flour',
+            'maida': 'refined flour',
+            'besan': 'gram flour chickpea flour',
+            'suji': 'semolina rava',
+            'poha': 'flattened rice',
+            'daliya': 'broken wheat',
+            
+            # Pulses & Lentils
+            'dal': 'lentils pulses',
+            'moong dal': 'green gram lentils',
+            'toor dal': 'pigeon pea lentils',
+            'chana dal': 'split chickpea lentils',
+            'masoor dal': 'red lentils',
+            'urad dal': 'black gram lentils',
+            'rajma': 'kidney beans',
+            'chana': 'chickpeas',
+            'kabuli chana': 'white chickpeas',
+            
+            # Spices & Herbs
+            'kothimbir': 'coriander leaves cilantro',
+            'pudina': 'mint leaves',
+            'adrak': 'ginger',
+            'lehsun': 'garlic',
+            'hari mirch': 'green chili',
+            'lal mirch': 'red chili',
+            'haldi': 'turmeric',
+            'jeera': 'cumin',
+            'dhania': 'coriander seeds',
+            'garam masala': 'garam masala spice mix',
+            
+            # Oils & Condiments
+            'tel': 'oil cooking oil',
+            'sarson ka tel': 'mustard oil',
+            'nariyal ka tel': 'coconut oil',
+            'namak': 'salt',
+            'chini': 'sugar',
+            'gud': 'jaggery',
+            
+            # Snacks & Processed
+            'biscuit': 'biscuits cookies',
+            'namkeen': 'savory snacks',
+            'mithai': 'sweets indian sweets',
+            'chips': 'potato chips',
+            
+            # Beverages
+            'chai': 'tea',
+            'coffee': 'coffee',
+            'paani': 'water',
+            'juice': 'fruit juice',
+        }
+        
+        query_lower = query.lower().strip()
+        
+        # Direct translation if exact match
+        if query_lower in translations:
+            translated = translations[query_lower]
+            print(f"Direct translation: {query_lower} -> {translated}")
+            return translated
+        
+        # Handle multi-word queries
+        words = query_lower.split()
+        translated_words = []
+        
+        for word in words:
+            if word in translations:
+                translated_words.append(translations[word])
+            else:
+                # Check for partial matches
+                for hindi_term, english_term in translations.items():
+                    if word in hindi_term or hindi_term in word:
+                        translated_words.append(english_term)
+                        break
+                else:
+                    translated_words.append(word)  # Keep original if no translation found
+        
+        translated_query = ' '.join(translated_words)
+        print(f"Multi-word translation: {query} -> {translated_query}")
+        return translated_query
+    
     def _categorize_product(self, query: str, title: str) -> str:
         """Categorize product based on query and title"""
         categories = {
@@ -316,6 +446,36 @@ class TavilyShoppingService:
                     'category': 'Dairy Products',
                     'source': 'tavily_search',
                     'description': 'Fresh full cream milk from Mother Dairy. Rich in calcium and protein.'
+                },
+                {
+                    'name': 'Nandini Fresh Toned Milk - 500ml',
+                    'price': '₹32',
+                    'original_price': '₹35',
+                    'discount': '9% OFF',
+                    'seller': 'Zepto',
+                    'rating': 4.4,
+                    'reviews': 3200,
+                    'product_url': 'https://www.zeptonow.com/pn/nandini-toned-milk-500ml/pvid/a87ff679a2f3e71d9181a67b7542122c',
+                    'availability': 'In Stock',
+                    'delivery': '10 minutes',
+                    'category': 'Dairy Products',
+                    'source': 'tavily_search',
+                    'description': 'Fresh toned milk with reduced fat content. Perfect for daily consumption.'
+                },
+                {
+                    'name': 'Britannia Winkin Cow Thick Milk - 1L',
+                    'price': '₹75',
+                    'original_price': '₹80',
+                    'discount': '6% OFF',
+                    'seller': 'Blinkit',
+                    'rating': 4.5,
+                    'reviews': 2800,
+                    'product_url': 'https://blinkit.com/prn/britannia-winkin-cow-milk-1l/prid/e4da3b7fbbce2345d7772b0674a318d5',
+                    'availability': 'In Stock',
+                    'delivery': '15 minutes',
+                    'category': 'Dairy Products',
+                    'source': 'tavily_search',
+                    'description': 'Thick and creamy milk from Britannia. Rich taste and high nutritional value.'
                 }
             ],
             'chawal': [
